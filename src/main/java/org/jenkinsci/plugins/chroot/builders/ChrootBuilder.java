@@ -137,7 +137,7 @@ public class ChrootBuilder extends Builder implements Serializable {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         EnvVars env = build.getEnvironment(listener);
-        ChrootToolset installation = ChrootToolset.getInstallationByName(this.chrootName);
+        ChrootToolset installation = ChrootToolset.getInstallationByName(env.expand(this.chrootName));
         installation = installation.forNode(build.getBuiltOn(), listener);
         installation = installation.forEnvironment(env);
         if (installation.getHome() == null) {
@@ -148,7 +148,7 @@ public class ChrootBuilder extends Builder implements Serializable {
         }
         FilePath tarBall = new FilePath(build.getBuiltOn().getChannel(), installation.getHome());
 
-        FilePath workerTarBall = build.getWorkspace().child(this.chrootName).child(tarBall.getName());
+        FilePath workerTarBall = build.getWorkspace().child(env.expand(this.chrootName)).child(tarBall.getName());
         workerTarBall.getParent().mkdirs();
 
         // force environment recreation when clear is selected
